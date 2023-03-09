@@ -1,15 +1,20 @@
 package httpclient;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.*;
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.entity.mime.HttpMultipartMode;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
@@ -77,6 +82,15 @@ public class Request {
     public Request setParameter(String key, String value) throws URISyntaxException {
         URI uri = new URIBuilder(request.getRequestLine().getUri()).addParameter(key, value).build();
         ((HttpRequestBase) request).setURI(uri);
+        return this;
+    }
+
+    public Request setFile(File file, String fileName) {
+        final MultipartEntityBuilder builder = MultipartEntityBuilder.create();
+        builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
+        builder.addBinaryBody("file", file, ContentType.DEFAULT_BINARY, fileName);
+        final HttpEntity entity = builder.build();
+        ((HttpEntityEnclosingRequestBase) request).setEntity(entity);
         return this;
     }
 
