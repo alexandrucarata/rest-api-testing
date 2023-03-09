@@ -4,6 +4,7 @@ import httpclient.Request;
 import httpclient.Scope;
 import org.apache.http.HttpResponse;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
@@ -31,6 +32,14 @@ public class Client {
                 .setHeader("Content-Type", "application/json")
                 .setBearerAuthentication(Authentication.getToken(Scope.WRITE))
                 .setBody(body)
+                .executeRequest();
+    }
+
+    public static HttpResponse executePost(String resource, File file, String fileName) throws IOException {
+        return Request
+                .postRequest(URL + resource)
+                .setBearerAuthentication(Authentication.getToken(Scope.WRITE))
+                .setFile(file, fileName)
                 .executeRequest();
     }
 

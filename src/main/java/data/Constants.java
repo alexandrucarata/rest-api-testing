@@ -8,6 +8,7 @@ public class Constants {
     public static final String ZIPCODES_RESOURCE = "/zip-codes";
     public static final String ZIPCODES_EXPAND_RESOURCE = "/zip-codes/expand";
     public static final String USERS_RESOURCE = "/users";
+    public static final String USERS_UPLOAD_RESOURCE = "/users/upload";
     public static final int OK_STATUS = 200;
     public static final int CREATED_STATUS = 201;
     public static final int NO_CONTENT_STATUS = 204;
