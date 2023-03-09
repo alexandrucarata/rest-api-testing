@@ -1,7 +1,6 @@
 import client.UserClient;
 import client.ZipCodeClient;
 import com.github.javafaker.Faker;
-import data.Response;
 import data.User;
 import io.qameta.allure.*;
 import org.junit.jupiter.api.Assertions;

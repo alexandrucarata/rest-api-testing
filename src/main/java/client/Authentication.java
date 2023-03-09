@@ -1,7 +1,6 @@
 package client;
 
 import data.Auth;
-import httpclient.Scope;
 import io.restassured.response.Response;
 
 import java.io.IOException;

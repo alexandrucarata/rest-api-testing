@@ -3,7 +3,6 @@ package client;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import data.User;
 import data.UserPair;
-import httpclient.Scope;
 import io.qameta.allure.Step;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;

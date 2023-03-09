@@ -1,4 +1,4 @@
-package httpclient;
+package client;
 
 public enum Scope {
     WRITE, READ
