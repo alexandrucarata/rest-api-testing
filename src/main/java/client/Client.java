@@ -42,4 +42,13 @@ public class Client {
                 .setBody(body)
                 .executeRequest();
     }
+
+    public static HttpResponse executeDelete(String resource, String body) throws IOException {
+        return Request
+                .deleteRequest(URL + resource)
+                .setHeader("Content-Type", "application/json")
+                .setBearerAuthentication(Authentication.getToken(Scope.WRITE))
+                .setBody(body)
+                .executeRequest();
+    }
 }
