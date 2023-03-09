@@ -3,6 +3,7 @@ package client;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.javafaker.Faker;
 import data.Response;
+import io.qameta.allure.Step;
 import org.apache.http.HttpResponse;
 
 import java.io.IOException;
@@ -15,6 +16,7 @@ import static data.Constants.ZIPCODES_EXPAND_RESOURCE;
 import static data.Constants.ZIPCODES_RESOURCE;
 
 public class ZipCodeClient {
+    @Step("Get Zip Codes List")
     public Response<List<String>> getZipCodesList() throws IOException {
         Response<List<String>> response = new Response<>();
         HttpResponse httpResponse = executeGetZipCodes();
@@ -23,6 +25,7 @@ public class ZipCodeClient {
         return response;
     }
 
+    @Step("Add Zip Codes to Zip Codes List")
     public Response<List<String>> addToZipCodesList(List<String> zipCodesList) throws IOException {
         Response<List<String>> response = new Response<>();
         HttpResponse httpResponse = executePostZipCodes(zipCodesList.toString());
@@ -31,6 +34,7 @@ public class ZipCodeClient {
         return response;
     }
 
+    @Step("Get Newly Created Zip Code")
     public String getNewZipCode() throws IOException {
         String newZipCode = new Faker().number().digits(5);
         addToZipCodesList(Collections.singletonList(newZipCode));

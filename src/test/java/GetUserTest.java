@@ -2,6 +2,7 @@ import client.UserClient;
 import com.github.javafaker.Faker;
 import data.Response;
 import data.User;
+import io.qameta.allure.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,6 +14,8 @@ import java.util.stream.Collectors;
 
 import static data.Constants.OK_STATUS;
 
+@Epic("User Management")
+@Story("Getting Users")
 public class GetUserTest {
     private static UserClient userClient;
 
@@ -32,6 +35,9 @@ public class GetUserTest {
 
     // Scenario #1:
     @Test
+    @AllureId("API-9")
+    @Feature("Ability to Get User List")
+    @Description("Check if user list is successfully returned")
     void getAllUsersTest() throws IOException {
         Response<List<User>> usersResponse = userClient.getUsersList();
 
@@ -43,6 +49,9 @@ public class GetUserTest {
 
     // Scenario #2:
     @Test
+    @AllureId("API-10")
+    @Feature("Ability to Get Older User List")
+    @Description("Check if user list with older users is successfully returned")
     void getOlderUsersTest() throws IOException, URISyntaxException {
         int ageLimit = 18;
         Response<List<User>> allUsersResponse = userClient.getUsersList();
@@ -58,6 +67,9 @@ public class GetUserTest {
 
     // Scenario #3:
     @Test
+    @AllureId("API-11")
+    @Feature("Ability to Get Younger User List")
+    @Description("Check if user list with younger users is successfully returned")
     void getYoungerUsersTest() throws IOException, URISyntaxException {
         int ageLimit = 18;
         Response<List<User>> allUsersResponse = userClient.getUsersList();
@@ -73,6 +85,9 @@ public class GetUserTest {
 
     // Scenario #4:
     @Test
+    @AllureId("API-12")
+    @Feature("Ability to Get certain Sex User List")
+    @Description("Check if user list with certain sex is successfully returned")
     void getUsersOfSexTest() throws IOException, URISyntaxException {
         String sex = "FEMALE";
         Response<List<User>> allUsersResponse = userClient.getUsersList();
