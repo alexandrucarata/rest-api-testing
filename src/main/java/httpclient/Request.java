@@ -6,10 +6,12 @@ import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.*;
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -56,8 +58,19 @@ public class Request {
         return this;
     }
 
+    public Request setBearerAuthentication(String token) {
+        setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + token);
+        return this;
+    }
+
     public Request setHeader(String key, String value) {
         request.addHeader(key, value);
+        return this;
+    }
+
+    public Request setBody(String body) throws UnsupportedEncodingException {
+        StringEntity entity = new StringEntity(body);
+        ((HttpPost) request).setEntity(entity);
         return this;
     }
 
