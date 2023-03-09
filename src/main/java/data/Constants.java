@@ -11,5 +11,6 @@ public class Constants {
     public static final int OK_STATUS = 200;
     public static final int CREATED_STATUS = 201;
     public static final int BAD_STATUS = 400;
+    public static final int CONFLICT_STATUS = 409;
     public static final int DEPENDENCY_STATUS = 424;
 }

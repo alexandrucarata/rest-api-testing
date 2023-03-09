@@ -33,4 +33,13 @@ public class Client {
                 .setBody(body)
                 .executeRequest();
     }
+
+    public static HttpResponse executePatch(String resource, String body) throws IOException {
+        return Request
+                .patchRequest(URL + resource)
+                .setHeader("Content-Type", "application/json")
+                .setBearerAuthentication(Authentication.getToken(Scope.WRITE))
+                .setBody(body)
+                .executeRequest();
+    }
 }
