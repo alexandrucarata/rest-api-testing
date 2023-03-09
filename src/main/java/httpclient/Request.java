@@ -27,7 +27,7 @@ public class Request {
             case POST -> request = new HttpPost(uri);
             case PUT -> request = new HttpPut(uri);
             case PATCH -> request = new HttpPatch(uri);
-            case DELETE -> request = new HttpDelete(uri);
+            case DELETE -> request = new HttpDeleteWithBody(uri);
             default -> throw new RuntimeException();
         }
     }

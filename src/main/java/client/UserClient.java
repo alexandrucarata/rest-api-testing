@@ -43,6 +43,11 @@ public class UserClient {
         return response.getStatusLine().getStatusCode();
     }
 
+    public int deleteUser(User user) throws IOException {
+        HttpResponse response = executeDeleteUser(user);
+        return response.getStatusLine().getStatusCode();
+    }
+
     private static HttpResponse executeGetUsersList() throws IOException {
         return Client.executeGet(USERS_RESOURCE);
     }
@@ -59,6 +64,11 @@ public class UserClient {
     private static HttpResponse executePatchUser(UserPair userPair) throws IOException {
         String body = MAPPER.writeValueAsString(userPair);
         return Client.executePatch(USERS_RESOURCE, body);
+    }
+
+    private static HttpResponse executeDeleteUser(User user) throws IOException {
+        String body = MAPPER.writeValueAsString(user);
+        return Client.executeDelete(USERS_RESOURCE, body);
     }
 
     private static List<User> getResponseAsList(HttpResponse response) throws IOException {
