@@ -3,6 +3,7 @@ package client;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import data.Response;
 import data.User;
+import data.UserPair;
 import org.apache.http.HttpResponse;
 
 import java.io.IOException;
@@ -37,6 +38,11 @@ public class UserClient {
         return response.getStatusLine().getStatusCode();
     }
 
+    public int updateUser(UserPair userPair) throws IOException {
+        HttpResponse response = executePatchUser(userPair);
+        return response.getStatusLine().getStatusCode();
+    }
+
     private static HttpResponse executeGetUsersList() throws IOException {
         return Client.executeGet(USERS_RESOURCE);
     }
@@ -48,6 +54,11 @@ public class UserClient {
     private static HttpResponse executePostUser(User user) throws IOException {
         String body = MAPPER.writeValueAsString(user);
         return Client.executePost(USERS_RESOURCE, body);
+    }
+
+    private static HttpResponse executePatchUser(UserPair userPair) throws IOException {
+        String body = MAPPER.writeValueAsString(userPair);
+        return Client.executePatch(USERS_RESOURCE, body);
     }
 
     private static List<User> getResponseAsList(HttpResponse response) throws IOException {

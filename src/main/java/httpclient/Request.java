@@ -70,7 +70,7 @@ public class Request {
 
     public Request setBody(String body) throws UnsupportedEncodingException {
         StringEntity entity = new StringEntity(body);
-        ((HttpPost) request).setEntity(entity);
+        ((HttpEntityEnclosingRequestBase) request).setEntity(entity);
         return this;
     }
 
