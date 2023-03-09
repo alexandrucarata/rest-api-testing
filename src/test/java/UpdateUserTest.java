@@ -4,11 +4,12 @@ import com.github.javafaker.Faker;
 import data.User;
 import data.UserPair;
 import io.qameta.allure.*;
+import io.restassured.RestAssured;
+import io.restassured.response.Response;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
 import java.util.List;
 
 import static data.Constants.*;
@@ -22,7 +23,9 @@ public class UpdateUserTest {
     private static User userToChange;
 
     @BeforeEach
-    public void setup() throws IOException {
+    public void setup() {
+        RestAssured.baseURI = BASE_URI;
+        RestAssured.port = PORT;
         userClient = new UserClient();
         zipCodeClient = new ZipCodeClient();
         faker = new Faker();
@@ -40,18 +43,18 @@ public class UpdateUserTest {
     @AllureId("API-13")
     @Feature("Ability to Update User")
     @Description("Check if user is successfully updated")
-    void updateUserTest() throws IOException {
+    void updateUserTest() {
         User newUser = User.builder()
                 .name(faker.name().firstName())
                 .age(faker.number().numberBetween(1, 100))
                 .sex(faker.demographic().sex().toUpperCase())
                 .zipCode(userToChange.getZipCode())
                 .build();
-        int response = userClient.updateUser(new UserPair(newUser, userToChange));
-        List<User> userList = userClient.getUsersList().getBody();
+        Response response = userClient.updateUser(new UserPair(newUser, userToChange));
+        List<User> userList = userClient.getResponseAsList(userClient.getUsersList());
 
         Assertions.assertAll(
-                () -> Assertions.assertEquals(OK_STATUS, response),
+                () -> Assertions.assertEquals(OK_STATUS, response.getStatusCode()),
                 () -> Assertions.assertFalse(userList.contains(userToChange)),
                 () -> Assertions.assertTrue(userList.contains(newUser))
         );
@@ -59,22 +62,21 @@ public class UpdateUserTest {
 
     // Scenario #2:
     @Test
-    @Issue("5")
     @AllureId("API-14")
     @Feature("Inability to Update User with Unavailable Zip Code")
     @Description("Check if user with unavailable zip code is not updated")
-    void updateUnavailableZipUserTest() throws IOException {
+    void updateUnavailableZipUserTest() {
         User newUser = User.builder()
                 .name(faker.name().firstName())
                 .age(faker.number().numberBetween(1, 100))
                 .sex(faker.demographic().sex().toUpperCase())
                 .zipCode(faker.number().digits(5))
                 .build();
-        int response = userClient.updateUser(new UserPair(newUser, userToChange));
-        List<User> userList = userClient.getUsersList().getBody();
+        Response response = userClient.updateUser(new UserPair(newUser, userToChange));
+        List<User> userList = userClient.getResponseAsList(userClient.getUsersList());
 
         Assertions.assertAll(
-                () -> Assertions.assertEquals(DEPENDENCY_STATUS, response),
+                () -> Assertions.assertEquals(DEPENDENCY_STATUS, response.getStatusCode()),
                 () -> Assertions.assertFalse(userList.contains(newUser)),
                 () -> Assertions.assertTrue(userList.contains(userToChange))
         );
@@ -82,20 +84,19 @@ public class UpdateUserTest {
 
     // Scenario #3:
     @Test
-    @Issue("6")
     @AllureId("API-15")
     @Feature("Inability to Update User without Required Fields")
     @Description("Check if user without required fields is not updated")
-    void updateIncompleteUserZipTest() throws IOException {
+    void updateIncompleteUserZipTest() {
         User newUser = User.builder()
                 .age(faker.number().numberBetween(1, 100))
                 .zipCode(userToChange.getZipCode())
                 .build();
-        int response = userClient.updateUser(new UserPair(newUser, userToChange));
-        List<User> userList = userClient.getUsersList().getBody();
+        Response response = userClient.updateUser(new UserPair(newUser, userToChange));
+        List<User> userList = userClient.getResponseAsList(userClient.getUsersList());
 
         Assertions.assertAll(
-                () -> Assertions.assertEquals(CONFLICT_STATUS, response),
+                () -> Assertions.assertEquals(CONFLICT_STATUS, response.getStatusCode()),
                 () -> Assertions.assertFalse(userList.contains(newUser)),
                 () -> Assertions.assertTrue(userList.contains(userToChange))
         );

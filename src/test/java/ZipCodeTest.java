@@ -1,17 +1,17 @@
 import client.ZipCodeClient;
 import com.github.javafaker.Faker;
 import io.qameta.allure.*;
+import io.restassured.RestAssured;
+import io.restassured.response.Response;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
-import static data.Constants.CREATED_STATUS;
-import static data.Constants.OK_STATUS;
+import static data.Constants.*;
 
 @Epic("Zip Code Management")
 @Story("Adding Zip Codes")
@@ -21,19 +21,21 @@ public class ZipCodeTest {
 
     @BeforeEach
     public void setup() {
+        RestAssured.baseURI = BASE_URI;
+        RestAssured.port = PORT;
         client = new ZipCodeClient();
     }
 
     // Scenario #1:
     @Test
-    @Issue("1")
     @AllureId("API-1")
     @Feature("Ability to Get Zip Codes List")
     @Description("Check if zip codes list is successfully returned")
-    void getZipCodesTest() throws IOException {
-        Response<List<String>> response = client.getZipCodesList();
+    void getZipCodesTest() {
+        Response response = client.getZipCodesList();
+
         Assertions.assertAll(
-                () -> Assertions.assertTrue(response.getBody().containsAll(AVAILABLE_ZIP_CODES)),
+                () -> Assertions.assertTrue(client.getResponseAsList(response).containsAll(AVAILABLE_ZIP_CODES)),
                 () -> Assertions.assertEquals(OK_STATUS, response.getStatusCode())
         );
     }
@@ -43,44 +45,42 @@ public class ZipCodeTest {
     @AllureId("API-2")
     @Feature("Ability to Add Zip Codes")
     @Description("Check if new zip codes are successfully added")
-    void addZipCodesTest() throws IOException {
+    void addZipCodesTest() {
         List<String> newZipCodesList = Arrays.asList(
                 new Faker().number().digits(5), new Faker().number().digits(5));
-        Response<List<String>> response = client.addToZipCodesList(newZipCodesList);
+        Response response = client.addToZipCodesList(newZipCodesList);
         Assertions.assertAll(
-                () -> Assertions.assertTrue(response.getBody().containsAll(newZipCodesList)),
+                () -> Assertions.assertTrue(client.getResponseAsList(response).containsAll(newZipCodesList)),
                 () -> Assertions.assertEquals(CREATED_STATUS, response.getStatusCode())
         );
     }
 
     // Scenario #3:
     @Test
-    @Issue("2")
     @AllureId("API-3")
     @Feature("Inability to Add Duplicates")
     @Description("Check if only distinct zip codes can be added")
-    void addDuplicatedZipCodesTest() throws IOException {
+    void addDuplicatedZipCodesTest() {
         String randomZipCode = new Faker().number().digits(5);
         List<String> duplicatedZipCodesList = Arrays.asList(randomZipCode, randomZipCode);
-        Response<List<String>> response = client.addToZipCodesList(duplicatedZipCodesList);
+        Response response = client.addToZipCodesList(duplicatedZipCodesList);
         Assertions.assertAll(
-                () -> Assertions.assertTrue(response.getBody().stream().allMatch(new HashSet<>()::add)),
+                () -> Assertions.assertTrue(client.getResponseAsList(response).stream().allMatch(new HashSet<>()::add)),
                 () -> Assertions.assertEquals(CREATED_STATUS, response.getStatusCode())
         );
     }
 
     // Scenario #4:
     @Test
-    @Issue("3")
     @AllureId("API-4")
     @Feature("Inability to Add Used Zip Codes")
     @Description("Check if used zip codes are not added")
-    void addUsedZipCodesTest() throws IOException {
+    void addUsedZipCodesTest() {
         List<String> usedZipCodesList = Arrays.asList("12345", "23456");
-        Response<List<String>> response = client.addToZipCodesList(usedZipCodesList);
+        Response response = client.addToZipCodesList(usedZipCodesList);
         Assertions.assertAll(
                 () -> usedZipCodesList.forEach(zipCode ->
-                        Assertions.assertEquals(1, response.getBody().stream()
+                        Assertions.assertEquals(1, client.getResponseAsList(response).stream()
                                 .filter(z -> z.equals(zipCode)).count())),
                 () -> Assertions.assertEquals(CREATED_STATUS, response.getStatusCode())
         );

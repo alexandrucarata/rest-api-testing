@@ -3,15 +3,15 @@ import client.ZipCodeClient;
 import com.github.javafaker.Faker;
 import data.User;
 import io.qameta.allure.*;
+import io.restassured.RestAssured;
+import io.restassured.response.Response;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
 import java.util.List;
 
-import static data.Constants.CONFLICT_STATUS;
-import static data.Constants.NO_CONTENT_STATUS;
+import static data.Constants.*;
 
 @Epic("User Management")
 @Story("Deleting Users")
@@ -21,7 +21,9 @@ public class DeleteUserTest {
     private static User user;
 
     @BeforeEach
-    public void setup() throws IOException {
+    public void setup() {
+        RestAssured.baseURI = BASE_URI;
+        RestAssured.port = PORT;
         userClient = new UserClient();
         zipCodeClient = new ZipCodeClient();
         Faker faker = new Faker();
@@ -39,14 +41,14 @@ public class DeleteUserTest {
     @AllureId("API-16")
     @Feature("Ability to Delete User")
     @Description("Check if user is successfully removed")
-    void deleteCompleteUserTest() throws IOException {
-        int response = userClient.deleteUser(user);
-        List<User> userList = userClient.getUsersList().getBody();
+    void deleteCompleteUserTest() {
+        Response response = userClient.deleteUser(user);
+        List<User> userList = userClient.getResponseAsList(userClient.getUsersList());
         String zipCode = user.getZipCode();
-        List<String> zipCodeList = zipCodeClient.getZipCodesList().getBody();
+        List<String> zipCodeList = zipCodeClient.getResponseAsList(zipCodeClient.getZipCodesList());
 
         Assertions.assertAll(
-                () -> Assertions.assertEquals(NO_CONTENT_STATUS, response),
+                () -> Assertions.assertEquals(NO_CONTENT_STATUS, response.getStatusCode()),
                 () -> Assertions.assertFalse(userList.contains(user)),
                 () -> Assertions.assertTrue(zipCodeList.contains(zipCode))
         );
@@ -54,22 +56,21 @@ public class DeleteUserTest {
 
     // Scenario #2:
     @Test
-    @Issue("7")
     @AllureId("API-17")
     @Feature("Ability to Delete User with Required Fields")
     @Description("Check if user is successfully removed by only required fields")
-    void deleteRequiredUserTest() throws IOException {
+    void deleteRequiredUserTest() {
         User userToDelete = User.builder()
                 .name(user.getName())
                 .sex(user.getSex())
                 .build();
-        int response = userClient.deleteUser(userToDelete);
-        List<User> userList = userClient.getUsersList().getBody();
+        Response response = userClient.deleteUser(userToDelete);
+        List<User> userList = userClient.getResponseAsList(userClient.getUsersList());
         String zipCode = user.getZipCode();
-        List<String> zipCodeList = zipCodeClient.getZipCodesList().getBody();
+        List<String> zipCodeList = zipCodeClient.getResponseAsList(zipCodeClient.getZipCodesList());
 
         Assertions.assertAll(
-                () -> Assertions.assertEquals(NO_CONTENT_STATUS, response),
+                () -> Assertions.assertEquals(NO_CONTENT_STATUS, response.getStatusCode()),
                 () -> Assertions.assertFalse(userList.contains(user)),
                 () -> Assertions.assertTrue(zipCodeList.contains(zipCode))
         );
@@ -80,19 +81,19 @@ public class DeleteUserTest {
     @AllureId("API-18")
     @Feature("Inability to Delete User without Required Fields")
     @Description("Check if user without required fields is not removed")
-    void deleteIncompleteUserTest() throws IOException {
+    void deleteIncompleteUserTest() {
         User userToDelete = User.builder()
                 .name(user.getName())
                 .age(user.getAge())
                 .zipCode(user.getZipCode())
                 .build();
-        int response = userClient.deleteUser(userToDelete);
-        List<User> userList = userClient.getUsersList().getBody();
+        Response response = userClient.deleteUser(userToDelete);
+        List<User> userList = userClient.getResponseAsList(userClient.getUsersList());
         String zipCode = user.getZipCode();
-        List<String> zipCodeList = zipCodeClient.getZipCodesList().getBody();
+        List<String> zipCodeList = zipCodeClient.getResponseAsList(zipCodeClient.getZipCodesList());
 
         Assertions.assertAll(
-                () -> Assertions.assertEquals(CONFLICT_STATUS, response),
+                () -> Assertions.assertEquals(CONFLICT_STATUS, response.getStatusCode()),
                 () -> Assertions.assertTrue(userList.contains(user)),
                 () -> Assertions.assertFalse(zipCodeList.contains(zipCode))
         );
