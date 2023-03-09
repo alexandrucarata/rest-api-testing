@@ -1,11 +1,13 @@
 package client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.javafaker.Faker;
 import data.Response;
 import org.apache.http.HttpResponse;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,6 +29,12 @@ public class ZipCodeClient {
         response.setBody(getResponseAsList(httpResponse));
         response.setStatusCode(httpResponse.getStatusLine().getStatusCode());
         return response;
+    }
+
+    public String getNewZipCode() throws IOException {
+        String newZipCode = new Faker().number().digits(5);
+        addToZipCodesList(Collections.singletonList(newZipCode));
+        return newZipCode;
     }
 
     private static HttpResponse executeGetZipCodes() throws IOException {
