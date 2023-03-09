@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import data.Response;
 import data.User;
 import data.UserPair;
+import io.qameta.allure.Step;
 import org.apache.http.HttpResponse;
 
 import java.io.File;
@@ -19,6 +20,7 @@ import static data.Constants.USERS_UPLOAD_RESOURCE;
 public class UserClient {
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
+    @Step("Get Users List")
     public Response<List<User>> getUsersList() throws IOException {
         Response<List<User>> response = new Response<>();
         HttpResponse httpResponse = executeGetUsersList();
@@ -27,6 +29,7 @@ public class UserClient {
         return response;
     }
 
+    @Step("Get Filtered Users List")
     public Response<List<User>> getUsersList(String key, String value) throws IOException, URISyntaxException {
         Response<List<User>> response = new Response<>();
         HttpResponse httpResponse = executeGetUsersList(key, value);
@@ -35,26 +38,31 @@ public class UserClient {
         return response;
     }
 
+    @Step("Add User to Users List")
     public int addToUsersList(User user) throws IOException {
         HttpResponse response = executePostUser(user);
         return response.getStatusLine().getStatusCode();
     }
 
+    @Step("Update User")
     public int updateUser(UserPair userPair) throws IOException {
         HttpResponse response = executePatchUser(userPair);
         return response.getStatusLine().getStatusCode();
     }
 
+    @Step("Delete User")
     public int deleteUser(User user) throws IOException {
         HttpResponse response = executeDeleteUser(user);
         return response.getStatusLine().getStatusCode();
     }
 
+    @Step("Upload User")
     public int uploadUser(File file, String fileName) throws IOException {
         HttpResponse response = executePostUser(file, fileName);
         return response.getStatusLine().getStatusCode();
     }
 
+    @Step("Create User File")
     public void createUsersFile(File file, List<User> userList) throws IOException {
         MAPPER.writeValue(file, userList);
     }
