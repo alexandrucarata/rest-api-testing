@@ -5,6 +5,7 @@ import httpclient.Scope;
 import org.apache.http.HttpResponse;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 
 import static data.Constants.URL;
 
@@ -13,6 +14,14 @@ public class Client {
         return Request
                 .getRequest(URL + resource)
                 .setBearerAuthentication(Authentication.getToken(Scope.READ))
+                .executeRequest();
+    }
+
+    public static HttpResponse executeGet(String resource, String key, String value) throws IOException, URISyntaxException {
+        return Request
+                .getRequest(URL + resource)
+                .setBearerAuthentication(Authentication.getToken(Scope.READ))
+                .setParameter(key, value)
                 .executeRequest();
     }
 

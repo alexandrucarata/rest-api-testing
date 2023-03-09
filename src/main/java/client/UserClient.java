@@ -6,6 +6,7 @@ import data.User;
 import org.apache.http.HttpResponse;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -23,6 +24,14 @@ public class UserClient {
         return response;
     }
 
+    public Response<List<User>> getUsersList(String key, String value) throws IOException, URISyntaxException {
+        Response<List<User>> response = new Response<>();
+        HttpResponse httpResponse = executeGetUsersList(key, value);
+        response.setBody(getResponseAsList(httpResponse));
+        response.setStatusCode(httpResponse.getStatusLine().getStatusCode());
+        return response;
+    }
+
     public int addToUsersList(User user) throws IOException {
         HttpResponse response = executePostUser(user);
         return response.getStatusLine().getStatusCode();
@@ -30,6 +39,10 @@ public class UserClient {
 
     private static HttpResponse executeGetUsersList() throws IOException {
         return Client.executeGet(USERS_RESOURCE);
+    }
+
+    private static HttpResponse executeGetUsersList(String key, String value) throws IOException, URISyntaxException {
+        return Client.executeGet(USERS_RESOURCE, key, value);
     }
 
     private static HttpResponse executePostUser(User user) throws IOException {
