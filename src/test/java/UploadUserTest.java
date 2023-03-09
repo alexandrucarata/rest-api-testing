@@ -3,6 +3,8 @@ import client.ZipCodeClient;
 import com.github.javafaker.Faker;
 import data.User;
 import io.qameta.allure.*;
+import io.restassured.RestAssured;
+import io.restassured.response.Response;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,7 +25,9 @@ public class UploadUserTest {
     private static List<User> userList;
 
     @BeforeEach
-    public void setup() throws IOException {
+    public void setup() {
+        RestAssured.baseURI = BASE_URI;
+        RestAssured.port = PORT;
         userClient = new UserClient();
         faker = new Faker();
         userList = new ArrayList<>();
@@ -45,17 +49,16 @@ public class UploadUserTest {
     void uploadValidUsersTest() throws IOException {
         File file = new File("src/test/resources/validUsers.json");
         userClient.createUsersFile(file, userList);
-        int statusCode = userClient.uploadUser(file, "validUsers.json");
-        List<User> finalUserList = userClient.getUsersList().getBody();
+        Response response = userClient.uploadUser(file);
+        List<User> finalUserList = userClient.getResponseAsList(userClient.getUsersList());
 
         Assertions.assertAll(
-                () -> Assertions.assertEquals(CREATED_STATUS, statusCode),
+                () -> Assertions.assertEquals(CREATED_STATUS, response.getStatusCode()),
                 () -> Assertions.assertEquals(userList, finalUserList)
         );
     }
 
     @Test
-    @Issue("8")
     @AllureId("API-20")
     @Feature("Inability to Upload Users with Invalid Zip Codes")
     @Description("Check if users with invalid zip codes are not uploaded")
@@ -63,17 +66,16 @@ public class UploadUserTest {
         userList.get(0).setZipCode(faker.number().digits(5));
         File file = new File("src/test/resources/invalidZipUsers.json");
         userClient.createUsersFile(file, userList);
-        int statusCode = userClient.uploadUser(file, "invalidZipUsers.json");
-        List<User> finalUserList = userClient.getUsersList().getBody();
+        Response response = userClient.uploadUser(file);
+        List<User> finalUserList = userClient.getResponseAsList(userClient.getUsersList());
 
         Assertions.assertAll(
-                () -> Assertions.assertEquals(DEPENDENCY_STATUS, statusCode),
+                () -> Assertions.assertEquals(DEPENDENCY_STATUS, response.getStatusCode()),
                 () -> Assertions.assertTrue(Collections.disjoint(finalUserList, userList))
         );
     }
 
     @Test
-    @Issue("9")
     @AllureId("API-21")
     @Feature("Inability to Upload Users without Required Fields")
     @Description("Check if users without required fields are not uploaded")
@@ -81,11 +83,11 @@ public class UploadUserTest {
         userList.get(0).setName(null);
         File file = new File("src/test/resources/incompleteUsers.json");
         userClient.createUsersFile(file, userList);
-        int statusCode = userClient.uploadUser(file, "incompleteUsers.json");
-        List<User> finalUserList = userClient.getUsersList().getBody();
+        Response response = userClient.uploadUser(file);
+        List<User> finalUserList = userClient.getResponseAsList(userClient.getUsersList());
 
         Assertions.assertAll(
-                () -> Assertions.assertEquals(CONFLICT_STATUS, statusCode),
+                () -> Assertions.assertEquals(CONFLICT_STATUS, response.getStatusCode()),
                 () -> Assertions.assertTrue(Collections.disjoint(finalUserList, userList))
         );
     }

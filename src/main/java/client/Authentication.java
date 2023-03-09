@@ -1,15 +1,13 @@
 package client;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import data.Auth;
-import httpclient.Request;
-import httpclient.Scope;
-import org.apache.http.HttpResponse;
+import io.restassured.response.Response;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
 
 import static data.Constants.*;
+import static io.restassured.RestAssured.given;
 
 public class Authentication {
     private static final String WRITE_TOKEN;
@@ -32,18 +30,16 @@ public class Authentication {
     }
 
     private static String getBearerToken(Scope scope) throws URISyntaxException, IOException {
-        ObjectMapper mapper = new ObjectMapper();
-        HttpResponse response = getTokenRequest(scope);
-        return mapper.readValue(response.getEntity().getContent(), Auth.class).getAccessToken();
+        return getTokenRequest(scope).as(Auth.class).getAccessToken();
     }
 
-    private static HttpResponse getTokenRequest(Scope scope) throws URISyntaxException, IOException {
-        return Request
-                .postRequest(URL + TOKEN_RESOURCE)
-                .setHeader("Content-Type", "application/json")
-                .setParameter("grant_type", "client_credentials")
-                .setParameter("scope", scope.name().toLowerCase())
-                .setBasicAuthentication(USERNAME, PASSWORD)
-                .executeRequest();
+    private static Response getTokenRequest(Scope scope) {
+        return given()
+                .param("grant_type", "client_credentials")
+                .param("scope", scope.name().toLowerCase())
+                .auth()
+                .basic(USERNAME, PASSWORD)
+                .when()
+                .post(URL + TOKEN_RESOURCE);
     }
 }
